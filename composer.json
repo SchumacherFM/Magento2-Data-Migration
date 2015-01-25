@@ -1,0 +1,20 @@
+{
+    "name": "schumacherfm/migrate",
+    "type": "application",
+    "description": "Migrates a Magento 1 database to Magento 2",
+    "license": "OSL-30",
+    "authors": [
+        {
+            "name": "Cyrill Schumacher",
+            "email": "cyrill@schumacher.fm"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.11",
+        "symfony/console": "~2.1"
+    },
+    "autoload": {
+        "psr-4": {"SchumacherFM\\Migrate\\": "SchumacherFM/Migrate/"}
+    },
+    "bin": ["migrator"]
+}

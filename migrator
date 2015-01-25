@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * (c) Cyrill Schumacher <cyrill@schumacher.fm>
+ *
+ * This source file is subject to the OSL-30 that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+if (version_compare(phpversion(), '5.4.11', '<')) {
+    fwrite(STDERR, "PHP needs to be a minimum version of PHP 5.4.11\n");
+    exit(1);
+}
+
+if (file_exists($a = __DIR__.'/../../../app/autoload.php')) {
+    require_once $a;
+} else {
+    die("\nMagento2 app/autoload.php not found!\n");
+}
+
+use SchumacherFM\Migrate\Console\Application;
+
+$application = new Application();
+$application->run();
