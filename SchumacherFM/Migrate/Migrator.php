@@ -10,6 +10,7 @@
 namespace SchumacherFM\Migrate;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 
 /**
  * @author Cyrill Schumacher <cyrill@schumacher.fm>
@@ -19,33 +20,40 @@ class Migrator
     const VERSION = '0.0.1';
 
     /**
+     * @var \Magento\Framework\DB\Adapter\Pdo\Mysql
+     */
+    private $db = null;
+
+    /**
      * @var OutputInterface
      */
     private $output = null;
 
-    /**
-     * ErrorsManager instance.
-     *
-     * @var ErrorsManager|null
-     */
-    protected $errorsManager;
+    private $verbosity = 0;
 
-
-    public function __construct(OutputInterface $output) {
+    public function __construct(OutputInterface $output, AdapterInterface $dbAdapter) {
         $this->output = $output;
-    }
-
-    public function migrate() {
-        $this->output->writeln('Hello World');
+        $this->db = $dbAdapter;
+        $this->verbosity = $output->getVerbosity();
     }
 
     /**
-     * Set ErrorsManager instance.
-     *
-     * @param ErrorsManager|null $errorsManager
+     * @return int 0 = success any other int = error
      */
-    public function setErrorsManager(ErrorsManager $errorsManager = null) {
-        $this->errorsManager = $errorsManager;
+    public function migrate() {
+        $this->_query('SET FOREIGN_KEY_CHECKS = 0;');
+
+        
+
+        $this->_query('SET FOREIGN_KEY_CHECKS = 1;');
+        return 0;
+    }
+
+    private function _query($sql, array $bind = []) {
+        $this->db->query($sql, $bind);
+        if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
+            $this->output->writeln('SQL: <info>' . $sql . '</info>');
+        }
     }
 
 }

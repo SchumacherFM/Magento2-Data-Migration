@@ -13,10 +13,11 @@ if (version_compare(phpversion(), '5.4.11', '<')) {
     exit(1);
 }
 
-if (file_exists($a = __DIR__.'/../../../app/autoload.php')) {
+$a = $a = __DIR__ . '/../../../app/autoload.php';
+if (file_exists($a)) {
     require_once $a;
 } else {
-    die("\nMagento2 app/autoload.php not found!\n");
+    die("\nMagento2 $a not found!\n");
 }
 
 use SchumacherFM\Migrate\Console\Application;
