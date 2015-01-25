@@ -1,5 +1,5 @@
 {
-    "name": "schumacherfm/migrate",
+    "name": "schumacherfm/mage1-to-mage2",
     "type": "application",
     "description": "Migrates a Magento 1 database to Magento 2",
     "license": "OSL-30",
