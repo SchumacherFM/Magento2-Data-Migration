@@ -10,6 +10,7 @@ namespace SchumacherFM\Migrate\Db\Adapter\Pdo;
 
 use \Magento\Framework\DB\Adapter\Pdo\Mysql as MageMySQL;
 use \Magento\Framework\DB\Ddl\Table;
+use Magento\Webapi\Exception;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -60,9 +61,20 @@ class Mysql extends MageMySQL
      * @return void|\Zend_Db_Statement_Pdo
      */
     public function query($sql, $bind = []) {
-        if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE && false === strpos($sql,'SHOW ')) {
+        if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE &&
+            false === strpos($sql, 'SHOW ')
+            && false === strpos($sql, 'DESCRIBE ')
+        ) {
             $this->output->writeln('SQL: <info>' . $sql . '</info>');
         }
-        return parent::query($sql, $bind);
+        $ret = null;
+        try {
+            $ret = parent::query($sql, $bind);
+        } catch (\Exception $e) {
+            $this->output->writeln(
+                'Failed: <error>' . $e->getMessage() . '</error>' . PHP_EOL . '<info>' . $sql . '</info>'
+            );
+        }
+        return $ret;
     }
 }

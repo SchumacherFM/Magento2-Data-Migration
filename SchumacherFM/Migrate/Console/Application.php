@@ -10,8 +10,9 @@
 namespace SchumacherFM\Migrate\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
-use SchumacherFM\Migrate\Console\Command\MigrateCommand;
-use SchumacherFM\Migrate\Migrator;
+use SchumacherFM\Migrate\Console\Command\MigrateCECommand;
+use SchumacherFM\Migrate\Console\Command\MigrateEECommand;
+use SchumacherFM\Migrate\MigratorCE;
 
 /**
  * @author Cyrill Schumacher <cyrill@schumacher.fm>
@@ -23,8 +24,9 @@ class Application extends BaseApplication
      */
     public function __construct() {
         error_reporting(-1);
-        parent::__construct('Magento2 Migrator', Migrator::VERSION);
-        $this->add(new MigrateCommand());
+        parent::__construct('Magento2 Migrator', MigratorCE::VERSION);
+        $this->add(new MigrateCECommand());
+        $this->add(new MigrateEECommand());
     }
 
     public function getLongVersion() {

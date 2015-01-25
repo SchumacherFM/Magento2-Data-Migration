@@ -15,23 +15,23 @@ use Magento\Framework\DB\Adapter\AdapterInterface;
 /**
  * @author Cyrill Schumacher <cyrill@schumacher.fm>
  */
-class Migrator extends \Magento\Setup\Module\Setup
+abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
 {
     const VERSION = '0.0.1';
 
-    private $mageCodeRoot = '';
+    protected $mageCodeRoot = '';
 
     /**
      * @var \SchumacherFM\Migrate\Db\Adapter\Pdo\Mysql
      */
-    private $db = null;
+    protected $db = null;
 
     /**
      * @var OutputInterface
      */
-    private $output = null;
+    protected $output = null;
 
-    private $tablePrefix = '';
+    protected $tablePrefix = '';
 
     public function __construct(OutputInterface $output, AdapterInterface $dbAdapter, $tablePrefix) {
         $this->output = $output;
@@ -40,46 +40,20 @@ class Migrator extends \Magento\Setup\Module\Setup
         $this->mageCodeRoot = __DIR__ . '/../../../../../app/code/Magento/';
     }
 
+
     /**
-     * @return int 0 = success any other int = error
+     *
+     * @param array $map
      */
-    public function migrate() {
-        $this->_100_renameTables();
-        $this->_200_createMissingTables();
-        $this->_300_updateForeignKeyNames();
-
-        return 0;
-    }
-
-    private function _100_renameTables() {
+    protected function renamer(array $map) {
         $this->db->startSetup();
-        $map = [
-            'core_email_template' => 'email_template',
-            'core_store' => 'store',
-            'core_store_group' => 'store_group',
-            'core_website' => 'store_website',
-            'coupon_aggregated' => 'salesrule_coupon_aggregated',
-            'coupon_aggregated_order' => 'salesrule_coupon_aggregated_order',
-            'coupon_aggregated_updated' => 'salesrule_coupon_aggregated_updated',
-        ];
         foreach ($map as $from => $to) {
-            $this->db->query('RENAME TABLE `' . $from . '` TO `' . $to . '`');
+            $this->db->query('RENAME TABLE `' . $this->tablePrefix . $from . '` TO `' . $to . '`');
         }
         $this->db->endSetup();
     }
 
-    private function _200_createMissingTables() {
-        $this->db->setAllowedCreateTables([
-            'admin_system_messages' => 1,
-            'core_theme' => 1,
-            'core_theme_file' => 1,
-        ]);
-        require($this->mageCodeRoot . 'AdminNotification/sql/adminnotification_setup/install-2.0.0.php');
-        require($this->mageCodeRoot . 'Core/sql/core_setup/install-2.0.0.php');
-        require($this->mageCodeRoot . 'Core/sql/core_setup/upgrade-2.0.0-2.0.1.php');
-    }
-
-    private function _300_updateForeignKeyNames() {
+    protected function _300_updateForeignKeyNames() {
         $tables = $this->db->getTables();
         foreach ($tables as $table) {
             $foreignKeys = $this->db->getForeignKeys($table);
@@ -106,6 +80,17 @@ class Migrator extends \Magento\Setup\Module\Setup
             }
         }
     }
+
+    protected function _alterTables(array $tables) {
+        $this->db->startSetup();
+        foreach ($tables as $name => $changes) {
+            foreach ($changes as $change) {
+                $this->db->query('ALTER TABLE `' . $name . '` ' . $change);
+            }
+        }
+        $this->db->endSetup();
+    }
+ 
 
     /**
      * @return \SchumacherFM\Migrate\Db\Adapter\Pdo\Mysql

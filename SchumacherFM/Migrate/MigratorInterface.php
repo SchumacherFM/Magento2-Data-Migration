@@ -1,5 +1,4 @@
 <?php
-
 /*
  * (c) Cyrill Schumacher <cyrill@schumacher.fm>
  *
@@ -7,14 +6,17 @@
  * with this source code in the file LICENSE.
  */
 
+
 namespace SchumacherFM\Migrate;
 
-class Utils
+/**
+ * @author Cyrill Schumacher <cyrill@schumacher.fm>
+ */
+interface MigratorInterface
 {
 
-    public static function splitLines($content) {
-        preg_match_all("/[^\n\r]+[\r\n]*/", $content, $matches);
-
-        return $matches[0];
-    }
+    /**
+     * @return int 0 = success any other int = error
+     */
+    public function migrate();
 }
