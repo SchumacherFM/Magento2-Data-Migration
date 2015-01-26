@@ -40,6 +40,16 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
         $this->mageCodeRoot = __DIR__ . '/../../../../../app/code/Magento/';
     }
 
+    /**
+     * @param array $tables
+     */
+    protected function pseudoDrop(array $tables) {
+        $t = [];
+        foreach ($tables as $table) {
+            $t[$table] = 'zz_' . $table;
+        }
+        $this->renamer($t);
+    }
 
     /**
      *
@@ -81,7 +91,10 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
         }
     }
 
-    protected function _alterTables(array $tables) {
+    /**
+     * @param array $tables
+     */
+    protected function alterTables(array $tables) {
         $this->db->startSetup();
         foreach ($tables as $name => $changes) {
             foreach ($changes as $change) {
@@ -90,7 +103,7 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
         }
         $this->db->endSetup();
     }
- 
+
 
     /**
      * @return \SchumacherFM\Migrate\Db\Adapter\Pdo\Mysql

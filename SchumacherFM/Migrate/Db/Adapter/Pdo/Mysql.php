@@ -34,24 +34,140 @@ class Mysql extends MageMySQL
     }
 
     /**
+     * hack for install script bypass
+     *
+     * @param string $tableName
+     * @param null $schemaName
+     * @return bool
+     */
+    public function isTableExists($tableName, $schemaName = null) {
+        $alwaysFalse = [
+            'admin_user' => 1,
+        ];
+        if (isset($alwaysFalse[$tableName])) {
+            return false;
+        }
+        return parent::isTableExists($tableName, $schemaName);
+    }
+
+    /**
      * @param Table $table
      * @return \Zend_Db_Statement_Pdo
      * @throws \Zend_Db_Exception
      */
     public function createTable(Table $table) {
         if (isset($this->allowedCreateTables[$table->getName()])) {
-            return parent::createTable($table);
+            if ($this->allowedCreateTables[$table->getName()] === 1) {
+                return parent::createTable($table);
+            } elseif (is_array($this->allowedCreateTables[$table->getName()])) {
+                foreach (['add', 'change', 'remove'] as $mode) {
+                    if (isset($this->allowedCreateTables[$table->getName()][$mode])) {
+                        $this->migrateTable($mode, $table, $this->allowedCreateTables[$table->getName()][$mode]);
+                    }
+                }
+                foreach (['refresh_idx', 'refresh_fk'] as $mode) {
+                    if (isset($this->allowedCreateTables[$table->getName()][$mode])) {
+                        $this->migrateKeys($mode, $table);
+                    }
+                }
+            }
         }
         if ($this->verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            $this->output->writeln('<comment>Table ' . $table->getName() . ' not allowed for creation</comment>');
+            $this->output->writeln('<comment>Table ' . $table->getName() . ' not allowed!</comment>');
         }
         return null;
     }
 
     /**
+     * drops all keys and then recreates them
+     *
+     * @param string $mode
+     * @param Table $table
+     * @throws \Zend_Db_Exception
+     */
+    private function migrateKeys($mode, Table $table) {
+        switch ($mode) {
+            case 'refresh_idx':
+                foreach ($this->getIndexList($table->getName()) as $index) {
+                    if ($index['KEY_NAME'] !== 'PRIMARY') {
+                        $this->dropIndex($table->getName(), $index['KEY_NAME']);
+                    }
+                }
+                foreach ($table->getIndexes() as $index) {
+                    $ic = [];
+                    foreach ($index['COLUMNS'] as $c) {
+                        $ic[] = $c['NAME'];
+                    }
+                    $this->addIndex($table->getName(), $index['INDEX_NAME'], $ic, $index['TYPE']);
+                }
+                break;
+            case 'refresh_fk':
+                foreach ($this->getForeignKeys($table->getName()) as $fk) {
+                    $this->dropForeignKey($table->getName(), $fk['FK_NAME']);
+                }
+                foreach ($table->getForeignKeys() as $fk) {
+                    $this->addForeignKey(
+                        $fk['FK_NAME'],
+                        $table->getName(),
+                        $fk['COLUMN_NAME'],
+                        $fk['REF_TABLE_NAME'],
+                        $fk['REF_COLUMN_NAME'],
+                        $fk['ON_DELETE'],
+                        $fk['ON_UPDATE']
+                    );
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * @param string $mode
+     * @param Table $table
+     * @param array|int $modifyColumns
+     * @throws \Zend_Db_Exception
+     */
+    private function migrateTable($mode, Table $table, $modifyColumns) {
+
+        if ($mode === 'remove' && is_array($modifyColumns)) {
+            $describedTable = $this->describeTable($table->getName());
+            foreach ($modifyColumns as $column) {
+                $cd = $this->getColumnCreateByDescribe($describedTable[$column]);
+                $this->changeColumn($table->getName(), $column, 'z_' . $column, $cd);
+            }
+            return;
+        }
+
+        $modifyColumns = array_flip($modifyColumns); // values are now keys
+        $modifyColumns = array_change_key_case($modifyColumns, CASE_UPPER);
+        $position = '';
+
+
+        foreach ($table->getColumns() as $name => $column) {
+            if (isset($modifyColumns[$name])) {
+                $column['AFTER'] = $position;
+                switch ($mode) {
+                    case 'add':
+                        $this->addColumn($table->getName(), $column['COLUMN_NAME'], $column);
+                        break;
+                    case 'change':
+                        $this->changeColumn($table->getName(), $column['COLUMN_NAME'], $column['COLUMN_NAME'], $column);
+                        break;
+                    default:
+                        throw new \InvalidArgumentException('Not implemented in migrateColumn method');
+                }
+            }
+            $position = $column['COLUMN_NAME'];
+        }
+        return;
+    }
+
+
+    /**
      * @param array $allowedCreateTables key tableName => bool
      */
-    public function setAllowedCreateTables(array $allowedCreateTables) {
+    public
+    function setAllowedCreateTables(array $allowedCreateTables) {
         $this->allowedCreateTables = $allowedCreateTables;
     }
 
@@ -60,7 +176,8 @@ class Mysql extends MageMySQL
      * @param array $bind
      * @return void|\Zend_Db_Statement_Pdo
      */
-    public function query($sql, $bind = []) {
+    public
+    function query($sql, $bind = []) {
         if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE &&
             false === strpos($sql, 'SHOW ')
             && false === strpos($sql, 'DESCRIBE ')

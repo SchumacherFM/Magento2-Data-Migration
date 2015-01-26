@@ -33,8 +33,13 @@ class MigrateCECommand extends AbstractMigrateCommand
        use the command line options here.
     4. Run the migration tool
     5. Clear caches of Magento2
-    6. Cross fingers & Load Magento2 backend or frontend
-    7. .... :-)
+    6. Reindex everything on the CLI
+    7. Cross fingers & Load Magento2 backend or frontend
+    8. .... :-)
+
+Your work after the migration:
+    1. Table cms_page: old column root_template new column page_layout => strings are written differently!
+    2. Table core_url_rewrite ...
 EOF
             );
     }
