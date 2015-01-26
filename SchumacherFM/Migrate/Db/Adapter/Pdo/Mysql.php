@@ -196,8 +196,7 @@ class Mysql extends MageMySQL
     /**
      * @param array $allowedCreateTables key tableName => bool
      */
-    public
-    function setAllowedCreateTables(array $allowedCreateTables) {
+    public function setAllowedCreateTables(array $allowedCreateTables) {
         $this->allowedCreateTables = $allowedCreateTables;
     }
 
@@ -206,8 +205,7 @@ class Mysql extends MageMySQL
      * @param array $bind
      * @return void|\Zend_Db_Statement_Pdo
      */
-    public
-    function query($sql, $bind = []) {
+    public function query($sql, $bind = []) {
         if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE &&
             false === strpos($sql, 'SHOW ')
             && false === strpos($sql, 'DESCRIBE ')

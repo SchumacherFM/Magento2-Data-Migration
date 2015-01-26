@@ -66,10 +66,10 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'sales_flat_shipment_grid' => 'sales_shipment_grid',
             'sales_flat_shipment_item' => 'sales_shipment_item',
             'sales_flat_shipment_track' => 'sales_shipment_track',
-            'oauth_nonce' => 'z_oauth_nonce', // special case table will be recreated
+            'oauth_nonce' => self::OLD_TABLE_PREFIX . 'oauth_nonce', // special case table will be recreated
+            'googleoptimizer_code' => self::OLD_TABLE_PREFIX . 'googleoptimizer_code', // special case table will be recreated
         ]);
     }
-
 
     private function _200_runSetupScripts() {
         // key => allowed table name
@@ -103,6 +103,18 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
+            'cataloginventory_stock_status' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalog_product_index_eav' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalog_product_index_eav_decimal' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
             'catalog_product_index_group_price' => [
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
@@ -116,6 +128,30 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_fk' => 1,
             ],
             'catalog_product_index_website' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalog_product_entity_tier_price' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalog_product_super_attribute_pricing' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalogrule_product' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'catalogrule_product_price' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'customer_eav_attribute_website' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'customer_entity' => [
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -143,8 +179,16 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'core_theme' => 1,
             'core_theme_file' => 1,
             'customer_visitor' => 1,
+            'googleoptimizer_code' => 1,
+            'googleshopping_attributes' => 1,
+            'googleshopping_items' => 1,
+            'googleshopping_types' => 1,
             'eav_attribute_group' => [
                 'add' => ['attribute_group_code', 'tab_group_code']
+            ],
+            'email_template' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
             ],
             'indexer_state' => 1,
             'mview_state' => 1,
@@ -153,6 +197,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'oauth_nonce' => 1,
             'oauth_token' => [
                 'add' => ['user_type'],
+                'change' => ['consumer_id'],
             ],
             'rating' => [
                 'add' => ['is_active'],
@@ -164,6 +209,14 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_fk' => 1,
             ],
             'wishlist' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'downloadable_link_purchased' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'downloadable_link_purchased_item' => [
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -228,6 +281,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_fk' => 1,
             ],
             'sales_creditmemo_item' => [
+                'add' => ['tax_ratio'],
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -244,6 +298,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_fk' => 1,
             ],
             'sales_invoice_item' => [
+                'add' => ['tax_ratio'],
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -357,7 +412,32 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
+            'salesrule_coupon_aggregated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'salesrule_coupon_aggregated_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'salesrule_coupon_aggregated_updated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'salesrule_product_attribute' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'salesrule_website' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'search_query' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
         ]);
+        // the order of the includes is important
         $setups = [
             'User/sql/user_setup/install-2.0.0.php',
             'AdminNotification/sql/adminnotification_setup/install-2.0.0.php',
@@ -373,12 +453,19 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'Customer/sql/customer_setup/install-2.0.0.php',
             'Customer/sql/customer_setup/upgrade-2.0.0-2.0.0.1.php',
             'Eav/sql/eav_setup/install-2.0.0.php',
+            'Email/sql/email_setup/install-2.0.0.php',
             'DesignEditor/sql/designeditor_setup/install-2.0.0.php',
+            'Downloadable/sql/downloadable_setup/install-2.0.0.php',
+            'GoogleOptimizer/sql/googleoptimizer_setup/install-2.0.0.php',
+            'GoogleShopping/sql/googleshopping_setup/install-2.0.0.php',
             'Indexer/sql/indexer_setup/install-2.0.0.php',
             'Integration/sql/integration_setup/install-2.0.0.php',
             'Review/sql/review_setup/install-2.0.0.php',
             'Quote/sql/quote_setup/install-2.0.0.php',
             'Sales/sql/sales_setup/install-2.0.0.php',
+            'SalesRule/sql/salesrule_setup/install-2.0.0.php',
+            'Search/sql/search_setup/install-2.0.0.php',
+            'Tax/sql/tax_setup/install-2.0.0.php',
             'Widget/sql/widget_setup/install-2.0.0.php',
             'Wishlist/sql/wishlist_setup/install-2.0.0.php',
         ];

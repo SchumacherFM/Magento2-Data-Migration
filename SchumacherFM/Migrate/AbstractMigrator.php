@@ -19,6 +19,8 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
 {
     const VERSION = '0.0.1';
 
+    const OLD_TABLE_PREFIX = 'zz_';
+
     protected $mageCodeRoot = '';
 
     /**
@@ -46,7 +48,7 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     protected function pseudoDrop(array $tables) {
         $t = [];
         foreach ($tables as $table) {
-            $t[$table] = 'zz_' . $table;
+            $t[$table] = self::OLD_TABLE_PREFIX . $table;
         }
         $this->renamer($t);
     }

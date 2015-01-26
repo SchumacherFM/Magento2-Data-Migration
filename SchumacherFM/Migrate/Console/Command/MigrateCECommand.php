@@ -43,12 +43,14 @@ Expected errors:
 
     1. Column "code" does not exist in table "widget". (because column name is already widget_code)
     2. Column "type" does not exist in table "widget"
+    3. Maybe: some renaming error for googleoptimizer_code
 
-Your work after the migration:
+Your work/review after the migration:
     - Table cms_page: old column root_template new column page_layout => strings are written differently!
     - Table widget_instance: Update the theme.
     - Table core_layout_link
-    - Table core_url_rewrite ...
+    - Table zz_googleoptimizer_code compared to googleoptimizer_code
+    - Table zz_core_url_rewrite compared to url_rewrite. For SEO reasons you can try to rebuild existing URLs ...
 EOF
             );
     }
