@@ -9,6 +9,7 @@
 
 namespace SchumacherFM\Migrate;
 
+use Magento\Webapi\Exception;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 
@@ -60,6 +61,7 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     protected function renamer(array $map) {
         $this->db->startSetup();
         foreach ($map as $from => $to) {
+            // we're not using db->renameTable() because of the exceptions
             $this->db->query('RENAME TABLE `' . $this->tablePrefix . $from . '` TO `' . $to . '`');
         }
         $this->db->endSetup();
@@ -94,20 +96,57 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
-     * @param array $tables
+     * Only execute once!
+     *
+     * @throws \Exception
      */
-    protected function alterTables(array $tables) {
-        $this->db->startSetup();
-        foreach ($tables as $name => $changes) {
-            foreach ($changes as $change) {
-                $this->db->query('ALTER TABLE `' . $name . '` ' . $change);
-            }
+    protected function runSqlSetup() {
+
+        $dir = $this->mageCodeRoot . '*/sql/*_setup/';
+        $setupModules = glob($dir);
+        if (0 === count($setupModules)) {
+            throw new \Exception('Cannot glob dir: ' . $dir);
         }
-        $this->db->endSetup();
+        foreach ($setupModules as $setup) {
+            $version = $this->requireAllSetup($setup);
+
+            $this->db->insert($this->tablePrefix . 'core_resource', [
+                'code' => $this->getSetupNameFromPath($setup),
+                'version' => $version,
+                'data_version' => new \Zend_Db_Expr('null'),
+            ]);
+        }
     }
 
+    /**
+     * @param string $path
+     * @return string
+     */
+    private function getSetupNameFromPath($path) {
+        $path = trim($path, DIRECTORY_SEPARATOR);
+        $pathPart = explode(DIRECTORY_SEPARATOR, $path);
+        return end($pathPart);
+    }
 
     /**
+     *
+     * @param string $pathPart
+     * @return string the last execute version ID
+     */
+    private function requireAllSetup($pathPart) {
+        $files = glob($pathPart . '*.php', GLOB_ERR);
+        $lastVersion = false;
+        foreach ($files as $file) {
+            require($file);
+            $fileParts = explode('-', basename($file, '.php'));
+            $lastVersion = end($fileParts);
+        }
+        return $lastVersion;
+    }
+
+    /**
+     * implemented because of require()
+     *
      * @return \SchumacherFM\Migrate\Db\Adapter\Pdo\Mysql
      */
     public function getConnection() {
@@ -115,7 +154,7 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
-     * @todo implement tablePrefix
+     * implemented because of require()
      *
      * @param $tableName
      * @return mixed

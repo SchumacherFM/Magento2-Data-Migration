@@ -25,7 +25,13 @@ class MigrateCECommand extends AbstractMigrateCommand
             ->setHelp(<<<EOF
     This program comes with ABSOLUTELY NO WARRANTY.
 
-    Increase verbosity to see the SQL commands: -v
+No tables will be dropped. Truncated table is core_resource.
+Obsolete tables will have the prefix zz_ in their name.
+Obsolete columns starts with z_.
+Keys and indexes on specific tables will be dropped and recreated. If you have custom foreign keys
+you must recreate them yourself afterwards.
+
+Increase verbosity to see the SQL commands: -v
 
 How to start:
 

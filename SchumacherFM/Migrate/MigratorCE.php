@@ -22,6 +22,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
      * @return int 0 = success any other int = error
      */
     public function migrate() {
+        $this->db->truncateTable($this->tablePrefix . 'core_resource');
         $this->_100_renameTables();
         $this->_200_runSetupScripts();
         $this->_300_updateForeignKeyNames();
@@ -436,42 +437,20 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
+            'store_website' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'store_group' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'store' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
         ]);
-        // the order of the includes is important
-        $setups = [
-            'User/sql/user_setup/install-2.0.0.php',
-            'AdminNotification/sql/adminnotification_setup/install-2.0.0.php',
-            'Authorization/sql/authorization_setup/install-2.0.0.php',
-            'Cms/sql/cms_setup/install-2.0.0.php',
-            'Catalog/sql/catalog_setup/install-2.0.0.php',
-            'Catalog/sql/catalog_setup/upgrade-2.0.0-2.0.0.1.php',
-            'CatalogInventory/sql/cataloginventory_setup/install-2.0.0.php',
-            'UrlRewrite/sql/urlrewrite_setup/install-2.0.0.php',
-            'CatalogUrlRewrite/sql/catalogurlrewrite_setup/install-2.0.0.php',
-            'Core/sql/core_setup/install-2.0.0.php',
-            'Core/sql/core_setup/upgrade-2.0.0-2.0.1.php',
-            'Customer/sql/customer_setup/install-2.0.0.php',
-            'Customer/sql/customer_setup/upgrade-2.0.0-2.0.0.1.php',
-            'Eav/sql/eav_setup/install-2.0.0.php',
-            'Email/sql/email_setup/install-2.0.0.php',
-            'DesignEditor/sql/designeditor_setup/install-2.0.0.php',
-            'Downloadable/sql/downloadable_setup/install-2.0.0.php',
-            'GoogleOptimizer/sql/googleoptimizer_setup/install-2.0.0.php',
-            'GoogleShopping/sql/googleshopping_setup/install-2.0.0.php',
-            'Indexer/sql/indexer_setup/install-2.0.0.php',
-            'Integration/sql/integration_setup/install-2.0.0.php',
-            'Review/sql/review_setup/install-2.0.0.php',
-            'Quote/sql/quote_setup/install-2.0.0.php',
-            'Sales/sql/sales_setup/install-2.0.0.php',
-            'SalesRule/sql/salesrule_setup/install-2.0.0.php',
-            'Search/sql/search_setup/install-2.0.0.php',
-            'Tax/sql/tax_setup/install-2.0.0.php',
-            'Widget/sql/widget_setup/install-2.0.0.php',
-            'Wishlist/sql/wishlist_setup/install-2.0.0.php',
-        ];
-        foreach ($setups as $setup) {
-            require($this->mageCodeRoot . $setup);
-        }
+        $this->runSqlSetup();
     }
 
     private function _990_pseudoDropTables() {

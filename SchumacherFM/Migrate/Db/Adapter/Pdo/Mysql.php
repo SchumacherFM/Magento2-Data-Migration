@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Mysql extends MageMySQL
 {
     private $allowedCreateTables = [];
+    private $allowedInsertForceTables = []; // usually no one is allowed in sql/*_setup/ scripts
     private $verbosity = 0;
     /**
      * @var OutputInterface
@@ -51,9 +52,19 @@ class Mysql extends MageMySQL
     }
 
     /**
-     * @param Table $table
-     * @return \Zend_Db_Statement_Pdo
-     * @throws \Zend_Db_Exception
+     * used in store_setup to create new stores which we don't like here.
+     *
+     * {@inheritdoc}
+     */
+    public function insertForce($table, array $bind) {
+        if (isset($this->allowedInsertForceTables[$table])) {
+            return parent::insertForce($table, $bind);
+        }
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function createTable(Table $table) {
         if (isset($this->allowedCreateTables[$table->getName()])) {
@@ -81,13 +92,7 @@ class Mysql extends MageMySQL
     /**
      * Implemented for Widget column change code to widget_code ... :-\
      *
-     * @param string $tableName
-     * @param string $oldColumnName
-     * @param string $newColumnName
-     * @param array $definition
-     * @param bool $flushData
-     * @param null $schemaName
-     * @return null|\Zend_Db_Statement_Pdo
+     * {@inheritdoc}
      */
     public function changeColumn(
         $tableName,
@@ -162,8 +167,10 @@ class Mysql extends MageMySQL
         if ($mode === 'remove' && is_array($modifyColumns)) {
             $describedTable = $this->describeTable($table->getName());
             foreach ($modifyColumns as $column) {
-                $cd = $this->getColumnCreateByDescribe($describedTable[$column]);
-                $this->changeColumn($table->getName(), $column, 'z_' . $column, $cd);
+                if (isset($describedTable[$column])) {
+                    $cd = $this->getColumnCreateByDescribe($describedTable[$column]);
+                    $this->changeColumn($table->getName(), $column, 'z_' . $column, $cd);
+                }
             }
             return;
         }
