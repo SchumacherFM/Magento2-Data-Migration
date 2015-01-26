@@ -6,7 +6,6 @@
  * with this source code in the file LICENSE.
  */
 
-
 namespace SchumacherFM\Migrate;
 
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,6 +26,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
         $this->_200_runSetupScripts();
         $this->_300_updateForeignKeyNames();
         $this->_400_checkCoreResource();
+        $this->_900_dropFlatTables();
         $this->_990_pseudoDropTables();
         return 0;
     }
@@ -35,7 +35,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
         // disable those data update modules where the data is already present.
         // other data updates must be executed
 
-         // hack because checkout has no sql setup scripts
+        // hack because checkout has no sql setup scripts
         $this->db->insert($this->tablePrefix . 'core_resource', [
             'code' => 'checkout_setup',
             'version' => '2.0.0',
@@ -52,7 +52,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'tax' => '2.0.0',
         ];
         foreach ($disableDataUpdates as $module => $version) {
-            $bind = [
+            $bind  = [
                 'data_version' => $version
             ];
             $where = [
@@ -100,7 +100,8 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'sales_flat_shipment_item' => 'sales_shipment_item',
             'sales_flat_shipment_track' => 'sales_shipment_track',
             'oauth_nonce' => self::OLD_TABLE_PREFIX . 'oauth_nonce', // special case table will be recreated
-            'googleoptimizer_code' => self::OLD_TABLE_PREFIX . 'googleoptimizer_code', // special case table will be recreated
+            'googleoptimizer_code' => self::OLD_TABLE_PREFIX . 'googleoptimizer_code',
+            // special case table will be recreated
         ]);
     }
 
@@ -441,7 +442,9 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_fk' => 1,
             ],
             'sales_order_tax_item' => [
-                'add' => ['amount', 'base_amount', 'real_amount', 'real_base_amount', 'associated_item_id', 'taxable_item_type'],
+                'add' => ['amount', 'base_amount', 'real_amount', 'real_base_amount', 'associated_item_id',
+                    'taxable_item_type'
+                ],
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -483,6 +486,17 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             ],
         ]);
         $this->runSqlSetup();
+    }
+
+    private function _900_dropFlatTables() {
+        foreach ($this->db->getTables() as $name) {
+            if (
+                false !== strpos($name, 'catalog_category_flat_store') ||
+                false !== strpos($name, 'catalog_product_flat_')
+            ) {
+                $this->db->query('DROP TABLE `' . $name . '`');
+            }
+        }
     }
 
     private function _990_pseudoDropTables() {

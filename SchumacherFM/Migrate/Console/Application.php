@@ -31,12 +31,17 @@ class Application extends BaseApplication
 
     public function getLongVersion() {
         $version = parent::getLongVersion() . ' by <comment>Cyrill Schumacher</comment>';
-        $commit = '@git-commit@';
+        $commit  = '@git-commit@';
 
         if ('@' . 'git-commit@' !== $commit) {
             $version .= ' (' . substr($commit, 0, 7) . ')';
         }
 
         return $version;
+    }
+
+    public function getHelp() {
+        return parent::getHelp() . PHP_EOL . PHP_EOL .
+        '<info>You must read the help. Run:</info> <comment>vendor/bin/migrator help migrate_xx</comment>';
     }
 }

@@ -14,7 +14,7 @@ namespace SchumacherFM\Migrate\Console\Command;
 class MigrateEECommand extends AbstractMigrateCommand
 {
     protected $_migratorClass = 'MigratorEE';
-    
+
     /**
      * @see Command
      */
@@ -27,6 +27,13 @@ class MigrateEECommand extends AbstractMigrateCommand
 This program comes with ABSOLUTELY NO WARRANTY.
 
     You must first run the process for CE.
+
+Increase verbosity to see the SQL commands: -v
+
+How to start:
+
+    1. Run the migration process for CE - community edition.
+    2. ...
 
 EOF
             );

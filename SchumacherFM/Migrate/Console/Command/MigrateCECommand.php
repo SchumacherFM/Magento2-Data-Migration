@@ -25,7 +25,8 @@ class MigrateCECommand extends AbstractMigrateCommand
             ->setHelp(<<<EOF
     This program comes with ABSOLUTELY NO WARRANTY.
 
-No tables will be dropped. Truncated table is core_resource.
+No tables will be dropped except catalog_category_flat* and catalog_product_flat_*.
+Truncated table is core_resource.
 Obsolete tables will have the prefix zz_ in their name.
 Obsolete columns starts with z_.
 Keys and indexes on specific tables will be dropped and recreated. If you have custom foreign keys
@@ -39,7 +40,7 @@ How to start:
     2. Copy all tables and data into the new database for magento2
     3. Enter the new database access data either into app/config.php or
        use the command line options here.
-    4. Run the migration tool
+    4. Run the migration tool and wait ...
     5. Clear caches of Magento2
     6. Run: "$ php -f index.php update" in the root/setup directory
     7. Reindex everything on the CLI
