@@ -158,6 +158,8 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'add' => ['is_active'],
             ],
             'widget_instance' => [
+                'remove' => ['package_theme'],
+                'add' => ['theme_id'],
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
@@ -193,7 +195,158 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
                 'refresh_idx' => 1,
                 'refresh_fk' => 1,
             ],
-
+            'sales_bestsellers_aggregated_daily' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_bestsellers_aggregated_monthly' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_bestsellers_aggregated_yearly' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_billing_agreement' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_billing_agreement_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_creditmemo' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_creditmemo_comment' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_creditmemo_grid' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_creditmemo_item' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoice' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoice_comment' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoice_grid' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoice_item' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoiced_aggregated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_invoiced_aggregated_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_address' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_aggregated_created' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_aggregated_updated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_grid' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_item' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_payment' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_status' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_status_history' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_status_label' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_order_tax' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_payment_transaction' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_recurring_profile' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_recurring_profile_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_refunded_aggregated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_refunded_aggregated_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipment' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipment_comment' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipment_grid' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipment_item' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipment_track' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipping_aggregated' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
+            'sales_shipping_aggregated_order' => [
+                'refresh_idx' => 1,
+                'refresh_fk' => 1,
+            ],
             'sales_order_status_state' => [
                 'add' => ['visible_on_front'],
                 'refresh_idx' => 1,

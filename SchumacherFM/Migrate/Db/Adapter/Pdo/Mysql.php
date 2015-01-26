@@ -79,6 +79,36 @@ class Mysql extends MageMySQL
     }
 
     /**
+     * Implemented for Widget column change code to widget_code ... :-\
+     *
+     * @param string $tableName
+     * @param string $oldColumnName
+     * @param string $newColumnName
+     * @param array $definition
+     * @param bool $flushData
+     * @param null $schemaName
+     * @return null|\Zend_Db_Statement_Pdo
+     */
+    public function changeColumn(
+        $tableName,
+        $oldColumnName,
+        $newColumnName,
+        $definition,
+        $flushData = false,
+        $schemaName = null
+    ) {
+        $res = null;
+        try {
+            $res = parent::changeColumn($tableName, $oldColumnName, $newColumnName, $definition, $flushData, $schemaName);
+        } catch (\Zend_Db_Exception $e) {
+            if ($this->verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
+                $this->output->writeln('changeColumn: <error>' . $e->getMessage() . '</error>');
+            }
+        }
+        return $res;
+    }
+
+    /**
      * drops all keys and then recreates them
      *
      * @param string $mode

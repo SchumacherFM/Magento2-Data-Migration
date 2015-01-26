@@ -27,6 +27,8 @@ class MigrateCECommand extends AbstractMigrateCommand
 
     Increase verbosity to see the SQL commands: -v
 
+How to start:
+
     1. Create a new MySQL database
     2. Copy all tables and data into the new database for magento2
     3. Enter the new database access data either into app/config.php or
@@ -37,9 +39,16 @@ class MigrateCECommand extends AbstractMigrateCommand
     7. Cross fingers & Load Magento2 backend or frontend
     8. .... :-)
 
+Expected errors:
+
+    1. Column "code" does not exist in table "widget". (because column name is already widget_code)
+    2. Column "type" does not exist in table "widget"
+
 Your work after the migration:
-    1. Table cms_page: old column root_template new column page_layout => strings are written differently!
-    2. Table core_url_rewrite ...
+    - Table cms_page: old column root_template new column page_layout => strings are written differently!
+    - Table widget_instance: Update the theme.
+    - Table core_layout_link
+    - Table core_url_rewrite ...
 EOF
             );
     }
