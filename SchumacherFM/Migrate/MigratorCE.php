@@ -35,6 +35,12 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
         // disable those data update modules where the data is already present.
         // other data updates must be executed
 
+         // hack because checkout has no sql setup scripts
+        $this->db->insert($this->tablePrefix . 'core_resource', [
+            'code' => 'checkout_setup',
+            'version' => '2.0.0',
+            'data_version' => '2.0.0',
+        ]);
         $disableDataUpdates = [
             // @todo grep dynamically the last version from data/*_setup/ dir
             'log' => '1.6.0.0',
@@ -61,7 +67,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'core_email_template' => 'email_template',
             'core_store' => 'store',
             'core_store_group' => 'store_group',
-            'core_translate' => 'translate',
+            'core_translate' => 'translation',
             'core_website' => 'store_website',
             'coupon_aggregated' => 'salesrule_coupon_aggregated',
             'coupon_aggregated_order' => 'salesrule_coupon_aggregated_order',
