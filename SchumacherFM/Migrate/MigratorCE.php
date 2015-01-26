@@ -26,8 +26,34 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
         $this->_100_renameTables();
         $this->_200_runSetupScripts();
         $this->_300_updateForeignKeyNames();
+        $this->_400_checkCoreResource();
         $this->_990_pseudoDropTables();
         return 0;
+    }
+
+    private function _400_checkCoreResource() {
+        // disable those data update modules where the data is already present.
+        // other data updates must be executed
+
+        $disableDataUpdates = [
+            // @todo grep dynamically the last version from data/*_setup/ dir
+            'log' => '1.6.0.0',
+            'checkout' => '2.0.0',
+            'directory' => '2.0.0',
+            'sales' => '2.0.0',
+            'reports' => '2.0.0',
+            'review' => '2.0.0',
+            'tax' => '2.0.0',
+        ];
+        foreach ($disableDataUpdates as $module => $version) {
+            $bind = [
+                'data_version' => $version
+            ];
+            $where = [
+                'code = ?' => $module . '_setup'
+            ];
+            $this->db->update($this->tablePrefix . 'core_resource', $bind, $where);
+        }
     }
 
     private function _100_renameTables() {
@@ -467,7 +493,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'api_rule',
             'api_session',
             'api_user',
-            'core_url_rewrite', // will be recreated
+            'core_url_rewrite', // will be recreated as url_rewrite
             'catalog_category_anc_categs_index_idx',
             'catalog_category_anc_categs_index_tmp',
             'catalog_category_anc_products_index_idx',

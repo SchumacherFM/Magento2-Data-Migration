@@ -41,9 +41,9 @@ How to start:
        use the command line options here.
     4. Run the migration tool
     5. Clear caches of Magento2
-    6. Reindex everything on the CLI
-    7. Cross fingers & Load Magento2 backend or frontend
-    8. .... :-)
+    6. Run: "$ php -f index.php update" in the root/setup directory
+    7. Reindex everything on the CLI
+    8. Cross fingers & Load Magento2 backend or frontend
 
 Expected errors:
 
@@ -57,6 +57,7 @@ Your work/review after the migration:
     - Table core_layout_link
     - Table zz_googleoptimizer_code compared to googleoptimizer_code
     - Table zz_core_url_rewrite compared to url_rewrite. For SEO reasons you can try to rebuild existing URLs ...
+    - Check categories and remove Default ones.
 EOF
             );
     }
