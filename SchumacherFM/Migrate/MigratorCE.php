@@ -26,6 +26,7 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
         $this->_200_runSetupScripts();
         $this->_300_updateForeignKeyNames();
         $this->_400_checkCoreResource();
+        $this->_500_renameModelsInTables();
         $this->_900_dropFlatTables();
         $this->_990_pseudoDropTables();
         return 0;
@@ -52,13 +53,40 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'tax' => '2.0.0',
         ];
         foreach ($disableDataUpdates as $module => $version) {
-            $bind  = [
+            $bind = [
                 'data_version' => $version
             ];
             $where = [
                 'code = ?' => $module . '_setup'
             ];
             $this->db->update($this->tablePrefix . 'core_resource', $bind, $where);
+        }
+    }
+
+    /**
+     * @todo custom namespace not considered as you need to parse either the old config.xml files
+     * OR run get_aliases_map.php in Magento/Tools/Migration folder
+     */
+    private function _500_renameModelsInTables() {
+        $models = [
+            ['eav_entity_type', 'entity_type_id', 'entity_model', 'Resource\\'],
+            ['eav_entity_type', 'entity_type_id', 'entity_attribute_collection', 'Resource\\'],
+            ['eav_entity_type', 'entity_type_id', 'attribute_model', ''],
+            ['eav_entity_type', 'entity_type_id', 'increment_model', ''],
+            ['eav_attribute', 'attribute_id', 'backend_model', ''],
+            ['eav_attribute', 'attribute_id', 'source_model', ''],
+            ['catalog_eav_attribute', 'attribute_id', 'frontend_input_renderer', ''],
+            ['customer_eav_attribute', 'attribute_id', 'data_model', ''],
+            // did I forget something?
+
+        ];
+        foreach ($models as $model) {
+            call_user_func_array([$this, 'renameModelsInTables'], $model);
+        }
+
+        foreach (['additional_attribute_table', 'entity_table'] as $c) {
+            $this->db->query('UPDATE `eav_entity_type`
+          SET `' . $c . '`=REPLACE(`' . $c . '`,\'/\',\'_\') WHERE `' . $c . '` like \'%/%\'');
         }
     }
 
@@ -99,9 +127,9 @@ class MigratorCE extends AbstractMigrator implements MigratorInterface
             'sales_flat_shipment_grid' => 'sales_shipment_grid',
             'sales_flat_shipment_item' => 'sales_shipment_item',
             'sales_flat_shipment_track' => 'sales_shipment_track',
-            'oauth_nonce' => self::OLD_TABLE_PREFIX . 'oauth_nonce', // special case table will be recreated
+            // special case tables which will be recreated
+            'oauth_nonce' => self::OLD_TABLE_PREFIX . 'oauth_nonce',
             'googleoptimizer_code' => self::OLD_TABLE_PREFIX . 'googleoptimizer_code',
-            // special case table will be recreated
         ]);
     }
 

@@ -42,7 +42,10 @@ How to start:
        use the command line options here.
     4. Run the migration tool and wait ...
     5. Clear caches of Magento2
-    6. Run: "$ php -f index.php update" in the root/setup directory
+    6a. Follow the steps in https://github.com/magento/magento2/issues/1000#issue-55454189
+    6b. Run: "$ php -f index.php update" in the root/setup directory
+    6c. Check EAV tables IF you have custom models they will have the prefix Magento and not
+        your namespace. @todo
     7. Reindex everything on the CLI
     8. Cross fingers & Load Magento2 backend or frontend
 

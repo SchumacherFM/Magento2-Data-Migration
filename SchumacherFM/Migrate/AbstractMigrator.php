@@ -145,6 +145,39 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
+     * via call_user_func_array ...
+     *
+     * @param $tableName
+     * @param $idCol
+     * @param $renameCol
+     * @param $subPath
+     */
+    public function renameModelsInTables($tableName, $idCol, $renameCol, $subPath) {
+        foreach ($this->db->fetchAll('SELECT `' . $idCol . '`,`' . $renameCol . '` FROM `' . $tableName .
+            '` WHERE `' . $renameCol . '` like \'%/%\'') as $row) {
+            $this->db->update(
+                $tableName,
+                [$renameCol => $this->renameModel($row[$renameCol], $subPath)],
+                [$idCol . ' = ?' => $row[$idCol]]
+            );
+        }
+    }
+
+    /**
+     * @param string $oldName
+     * @param string $subPath
+     * @return string
+     */
+    private function renameModel($oldName, $subPath = '') {
+        $parts = explode('/', $oldName);
+        if (count($parts) !== 2) {
+            throw new Exception('_renameResourceModel: Excepting two parts for old model name: ' . $oldName);
+        }
+        $ns = 'Magento\\' . ucfirst($parts[0]) . '\\Model\\' . $subPath;
+        return $ns . str_replace(' ', '\\', ucwords(str_replace('_', ' ', $parts[1])));
+    }
+
+    /**
      * implemented because of require()
      *
      * @return \SchumacherFM\Migrate\Db\Adapter\Pdo\Mysql
