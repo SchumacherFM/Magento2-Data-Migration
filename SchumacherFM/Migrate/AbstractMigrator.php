@@ -36,6 +36,11 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
 
     protected $tablePrefix = '';
 
+    /**
+     * @param OutputInterface $output
+     * @param AdapterInterface $dbAdapter
+     * @param string $tablePrefix
+     */
     public function __construct(OutputInterface $output, AdapterInterface $dbAdapter, $tablePrefix) {
         $this->output = $output;
         $this->db = $dbAdapter;
@@ -96,6 +101,8 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
+     * Gets all full paths where sql/*_setup/ exists
+     *
      * Only execute once!
      *
      * @throws \Exception
@@ -129,6 +136,7 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
+     * gets all php files in a setup directory and loads them
      *
      * @param string $pathPart
      * @return string the last execute version ID
@@ -164,6 +172,8 @@ abstract class AbstractMigrator extends \Magento\Setup\Module\Setup
     }
 
     /**
+     * @todo consider custom modules now the namespace is always Magento\\
+     *
      * @param string $oldName
      * @param string $subPath
      * @return string

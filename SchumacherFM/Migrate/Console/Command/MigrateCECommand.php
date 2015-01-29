@@ -29,8 +29,8 @@ No tables will be dropped except catalog_category_flat* and catalog_product_flat
 Truncated table is core_resource.
 Obsolete tables will have the prefix zz_ in their name.
 Obsolete columns starts with z_.
-Keys and indexes on specific tables will be dropped and recreated. If you have custom foreign keys
-you must recreate them yourself afterwards.
+All keys and indexes on all tables will be dropped and recreated with the original install scripts.
+If you have custom foreign keys you must recreate them yourself afterwards.
 
 Increase verbosity to see the SQL commands: -v
 

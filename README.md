@@ -4,7 +4,7 @@ Migrates database from Magento 1.8,1.9 to Magento 2 beta5.
 
 This program comes with ABSOLUTELY NO WARRANTY.
 
-For each new Magento2 release/pre-release this module must be adapted.
+For each new Magento2 release/pre-release this module must be adapted, mainly when there are new setup scripts.
 
 Also Magento2 will change a lot of code so that more internal refactoring here will be necessary.
 
@@ -12,7 +12,7 @@ Also Magento2 will change a lot of code so that more internal refactoring here w
 
 Only via composer possible.
 
-Add to your `required-dev` section:
+Add to your `required-dev` section in your `composer.json`:
 
 ```
     "require-dev": {
@@ -95,8 +95,8 @@ Help:
  Truncated table is core_resource.
  Obsolete tables will have the prefix zz_ in their name.
  Obsolete columns starts with z_.
- Keys and indexes on specific tables will be dropped and recreated. If you have custom foreign keys
- you must recreate them yourself afterwards.
+ All keys and indexes on all tables will be dropped and recreated with the original install scripts.
+ If you have custom foreign keys you must recreate them yourself afterwards.
 
  Increase verbosity to see the SQL commands: -v or -vvv
 
